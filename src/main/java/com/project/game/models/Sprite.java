@@ -24,12 +24,12 @@ public class Sprite {
         return this;
     }
 
-    public Image getImage(String key){
+    public Image getSprite(String key){
         currentSprite = key;
         return sprites.get(key);
     }
 
-    public Image getCurrentImage(){
+    public Image getCurrentSprite(){
         if(currentSprite.length() == 0) return null;
         return sprites.get(currentSprite);
     }
