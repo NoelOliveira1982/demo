@@ -8,8 +8,6 @@ import javafx.scene.image.ImageView;
 
 public class Character extends AnimatedMovable  {
 
-    public static String prefixSprite = "0_Reaper_Man";
-
     private UUID id;
     private String name;
     private byte life;
@@ -23,7 +21,6 @@ public class Character extends AnimatedMovable  {
         this.life = life;
         this.strength = strength;
         this.resistance = resistance;
-        setSprites();
     }
     
     
@@ -66,12 +63,12 @@ public class Character extends AnimatedMovable  {
     public void setSprites(){
         int  i = 0;
         for (i = 0; i <= 17; i++) {
-            String spriteName = String.format(prefixSprite + "_Idle_%03d", i);
+            String spriteName = String.format(sprites.getPrefix() + "_Idle_%03d", i);
             Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Idle/" + spriteName + ".png"));
             sprites.addSprite(spriteName, image);
         }
         for (i = 0; i <= 11; i++) {
-            String spriteName = String.format(prefixSprite + "_Running_%03d", i);
+            String spriteName = String.format(sprites.getPrefix() + "_Running_%03d", i);
             Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Running/" + spriteName + ".png"));
             sprites.addSprite(spriteName, image);
         }

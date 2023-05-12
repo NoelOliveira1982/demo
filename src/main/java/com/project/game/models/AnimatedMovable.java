@@ -33,6 +33,7 @@ public abstract class AnimatedMovable {
         this.moveX = 0;
         this.moveY = 0;
         this.spriteReflected = false;
+        setSprites();
     }
 
     public void animateSprites(String prefix, int numSprites, int duration) {
@@ -118,7 +119,7 @@ public abstract class AnimatedMovable {
 
     public void playIdleAnimation() {
         setIdle(true);
-        animateSprites("Idle_", 17, 100);
+        animateSprites("_Idle_", 17, 100);
     }
 
     protected void setIdle(boolean idle) {
