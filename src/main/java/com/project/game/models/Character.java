@@ -16,13 +16,13 @@ public class Character extends AnimatedMovable  {
     private byte strength;
     private byte resistance;
 
-    public Character(String name, ImageView shape, byte speed, Point2D position, Sprite sprites){
+    public Character(String name, ImageView shape, byte speed, Point2D position, Sprite sprites, byte resistance, byte strength, byte life){
         super(speed, position, shape, sprites);
         this.id = UUID.randomUUID();
         this.name = name;
-        this.life = 100;
-        this.strength = 30;
-        this.resistance = 10;
+        this.life = life;
+        this.strength = strength;
+        this.resistance = resistance;
         setSprites();
     }
     
