@@ -9,23 +9,19 @@ public class KeyboardController {
     public static void keyboardHandlerPressed(KeyEvent event, Character player){
         switch (event.getCode()) {
             case UP: {
-                player.moveToUp();
-                if(player.getIsIdle()) player.setIdle(false);
+                player.moveToUp("Running_");
                 break;
             }
             case DOWN: {
-                player.moveToDown();
-                if(player.getIsIdle()) player.setIdle(false);
+                player.moveToDown("Running_");
                 break;
             }
             case LEFT: {
-                player.moveToLeft();
-                if(player.getIsIdle()) player.setIdle(false);
+                player.moveToLeft("Running_");
                 break;
             }
             case RIGHT: {
-                player.moveToRight();
-                if(player.getIsIdle()) player.setIdle(false);
+                player.moveToRight("Running_");
                 break;
             }
         }
@@ -34,10 +30,15 @@ public class KeyboardController {
     public static void keyboardHandlerReleased(KeyEvent event, Character player){
         switch (event.getCode()) {
             case UP:
-            case DOWN:
+            case DOWN: {
+                player.playIdleAnimation();
+                player.stopMoveY();
+                break;
+            }
             case LEFT:
             case RIGHT: {
                 player.playIdleAnimation();
+                player.stopMoveX();
                 break;
             }
         }

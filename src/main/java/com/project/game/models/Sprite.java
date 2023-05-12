@@ -7,11 +7,19 @@ import javafx.scene.image.Image;
 
 public class Sprite {
     private String currentSprite;
+    private String prefix;
     private Map<String, Image> sprites;
 
-    public Sprite(Map<String, Image> sprites){
+    public Sprite(Map<String, Image> sprites, String prefix){
         this.currentSprite = "";
         this.sprites = sprites;
+        this.prefix = prefix;
+    }
+
+    public Sprite(String prefix){
+        this.currentSprite = "";
+        this.sprites = new HashMap<>();
+        this.prefix = prefix;
     }
 
     public Sprite(){
@@ -32,5 +40,9 @@ public class Sprite {
     public Image getCurrentSprite(){
         if(currentSprite.length() == 0) return null;
         return sprites.get(currentSprite);
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 }
