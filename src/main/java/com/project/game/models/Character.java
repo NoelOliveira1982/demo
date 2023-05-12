@@ -25,14 +25,16 @@ public class Character {
     private byte speed;
     private Point2D position;
     private ImageView shape;
-    public Sprite sprites;
+    private Sprite sprites;
+    private boolean isIdle;
+    private boolean isLookingLeft;
 
     public Character(String name, ImageView shape){
         this.id = UUID.randomUUID();
         this.name = name;
         this.life = 100;
         this.strength = 30;
-        this.speed = 20;
+        this.speed = 5;
         this.resistance = 10;
         this.sprites = new Sprite();
         setSprites();
@@ -42,6 +44,8 @@ public class Character {
         this.shape.setY(position.getY());
         this.shape.setFitHeight(256);
         this.shape.setFitWidth(256);
+        this.isIdle = true;
+        this.isLookingLeft = false;
     }
 
     public void animateSprites(String prefix, int numSprites, int duration) {
@@ -61,10 +65,16 @@ public class Character {
             }
         }
         shape.setImage(sprites.getCurrentSprite());
+        if(isLookingLeft){
+            shape.setScaleX(-1);
+        } else {
+            shape.setScaleX(1);
+        }
         Timeline timeline = new Timeline(frames.toArray(new KeyFrame[0]));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
+    
     
 
     public Character beat(Character enemy){
@@ -81,6 +91,10 @@ public class Character {
         return id;
     }
 
+    public boolean getIsIdle(){
+        return isIdle;
+    }
+
     public byte getLife() {
         return life;
     }
@@ -94,34 +108,37 @@ public class Character {
     }
 
     public Character moveToDown(){
-        position.add(0, -speed);
-        shape.setY(position.getY());
-        playIdleAnimation();
+        if(isIdle) animateSprites("_Running_", 11, 100);
+        position = position.add(0, speed);
+        this.shape.setY(position.getY());
         return this;
     }
 
     public Character moveToLeft(){
-        position.add(-speed, 0);
-        shape.setX(position.getX());
-        playIdleAnimation();
+        setLookingLeft(true);
+        if(isIdle) animateSprites("_Running_", 11, 100);
+        position = position.add(-speed, 0);
+        this.shape.setX(position.getX());
         return this;
     }
 
     public Character moveToRight(){
-        position.add(speed, 0);
-        shape.setX(position.getX());
-        playIdleAnimation();
+        setLookingLeft(false);
+        if(isIdle) animateSprites("_Running_", 11, 100);
+        position = position.add(speed, 0);
+        this.shape.setX(position.getX());
         return this;
     }
 
     public Character moveToUp(){
-        position.add(0, speed);
-        shape.setY(position.getY());
-        playIdleAnimation();
+        if(isIdle) animateSprites("_Running_", 11, 100);
+        position = position.add(0, -speed);
+        this.shape.setY(position.getY());
         return this;
     }
 
     public void playIdleAnimation() {
+        setIdle(true);
         animateSprites("_Idle_", 17, 100);
     }    
 
@@ -130,10 +147,24 @@ public class Character {
         return  this;
     }
 
+    public void setIdle(boolean isIdle) {
+        this.isIdle = isIdle;
+    }
+
+    public void setLookingLeft(boolean isLookingLeft) {
+        this.isLookingLeft = isLookingLeft;
+    }
+
     public void setSprites(){
-        for (int i = 0; i <= 17; i++) {
+        int  i = 0;
+        for (i = 0; i <= 17; i++) {
             String spriteName = String.format(prefixSprite + "_Idle_%03d", i);
             Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Idle/" + spriteName + ".png"));
+            sprites.addSprite(spriteName, image);
+        }
+        for (i = 0; i <= 11; i++) {
+            String spriteName = String.format(prefixSprite + "_Running_%03d", i);
+            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Running/" + spriteName + ".png"));
             sprites.addSprite(spriteName, image);
         }
     }
