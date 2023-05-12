@@ -9,19 +9,19 @@ public class KeyboardController {
     public static void keyboardHandlerPressed(KeyEvent event, Character player){
         switch (event.getCode()) {
             case UP: {
-                player.moveToUp("Running_");
+                player.moveToUp("_Running_");
                 break;
             }
             case DOWN: {
-                player.moveToDown("Running_");
+                player.moveToDown("_Running_");
                 break;
             }
             case LEFT: {
-                player.moveToLeft("Running_");
+                player.moveToLeft("_Running_");
                 break;
             }
             case RIGHT: {
-                player.moveToRight("Running_");
+                player.moveToRight("_Running_");
                 break;
             }
         }

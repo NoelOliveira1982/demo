@@ -47,7 +47,7 @@ public class StageController implements Initializable {
             .withResistance((byte) 30).withShape(player1Shape)
             .withSpeed((byte) 5)
             .withStrength((byte) 30)
-            .withSprites(new  Sprite("0_Reaper_Man_"))
+            .withSprites(new  Sprite("0_Reaper_Man"))
             .build();
     }
 }
