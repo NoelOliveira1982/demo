@@ -27,6 +27,14 @@ public class App extends Application {
         stage.show();
     }
 
+    public static double getAppHeight(){
+        return scene.getHeight();
+    }
+
+    public static double getAppWidth(){
+        return scene.getWidth();
+    }
+
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml).load());
     }

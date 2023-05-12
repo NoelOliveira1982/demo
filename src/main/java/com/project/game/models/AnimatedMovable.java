@@ -3,6 +3,8 @@ package com.project.game.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.project.game.App;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -68,52 +70,24 @@ public abstract class AnimatedMovable {
     }
 
     public AnimatedMovable moveToDown(String prefix){
-        setMoveY(speed);
-        if(isIdle) {
-            animateSprites(prefix, 11, 100);
-            this.setIdle(false);
-        }
-        position = position.add(moveX, moveY);
-        this.shape.setX(position.getX());
-        this.shape.setY(position.getY());
+        updateLocalization(prefix, moveX, speed);
         return this;
     }
 
     public AnimatedMovable moveToLeft(String prefix){
-        setMoveX((byte) -speed);
         setSpriteReflected(true);
-        if(isIdle) {
-            animateSprites(prefix, 11, 100);
-            this.setIdle(false);
-        }
-        position = position.add(moveX, moveY);
-        this.shape.setX(position.getX());
-        this.shape.setY(position.getY());
+        updateLocalization(prefix, (byte) -speed, moveY);
         return this;
     }
 
     public AnimatedMovable moveToRight(String prefix){
-        setMoveX(speed);
         setSpriteReflected(false);
-        if(isIdle) {
-            animateSprites(prefix, 11, 100);
-            this.setIdle(false);
-        }
-        position = position.add(moveX, moveY);
-        this.shape.setX(position.getX());
-        this.shape.setY(position.getY());
+        updateLocalization(prefix, speed, moveY);
         return this;
     }
 
     public AnimatedMovable moveToUp(String prefix){
-        setMoveY((byte) -speed);
-        if(isIdle) {
-            animateSprites(prefix, 11, 100);
-            this.setIdle(false);
-        }
-        position = position.add(moveX, moveY);
-        this.shape.setX(position.getX());
-        this.shape.setY(position.getY());
+        updateLocalization(prefix, moveX, (byte) -speed);
         return this;
     }
 
@@ -146,6 +120,30 @@ public abstract class AnimatedMovable {
 
     public AnimatedMovable stopMoveX(){
         setMoveX((byte) 0);
+        return this;
+    }
+
+    private AnimatedMovable updateLocalization(String prefix, byte speedX, byte speedY){
+        if(isIdle) {
+            animateSprites(prefix, 11, 100);
+            this.setIdle(false);
+        }
+        if(
+            (!Collision.hasCollisionOnlyOneSide(shape.getX() + speed + shape.getFitHeight(), App.getAppWidth()) && speedX > 0) ||
+            (!Collision.hasCollisionOnlyOneSide(0, shape.getX() + speed) && speedX < 0)
+        ){
+            position = position.add(speedX, 0);
+            setMoveX((byte) speedX);
+            this.shape.setX(position.getX());
+        }
+        if(
+            (!Collision.hasCollisionOnlyOneSide(shape.getY() + shape.getFitHeight() + speed, App.getAppHeight()) && speedY > 0) ||
+            (!Collision.hasCollisionOnlyOneSide(0, shape.getY() + speed) && speedY < 0)
+        ){
+            position = position.add(0, speedY);
+            setMoveY((byte) speedY);
+            this.shape.setY(position.getY());
+        }
         return this;
     }
 
