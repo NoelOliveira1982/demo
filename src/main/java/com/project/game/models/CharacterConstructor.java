@@ -54,7 +54,7 @@ public class CharacterConstructor {
     }
     
     public Character build(){
-        return new Character(name, shape, speed, position, sprites);
+        return new Character(name, shape, speed, position, sprites, resistance, strength, life);
     }
 }
 
