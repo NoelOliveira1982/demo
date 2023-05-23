@@ -26,7 +26,7 @@ public class Character extends AnimatedMovable  {
     
 
     public Character beat(Character enemy){
-        if(!Collision.isCollision(this.position, enemy.position)) return enemy;
+        // if(!Collision.isCollision(this.position, enemy.position)) return enemy;
         return enemy.getBeaten(this.strength);
     }
 

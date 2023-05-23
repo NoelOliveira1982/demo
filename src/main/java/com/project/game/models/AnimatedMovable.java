@@ -3,12 +3,13 @@ package com.project.game.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.project.game.App;
+import com.project.game.controllers.CollisionController;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,24 +17,24 @@ import javafx.util.Duration;
 
 public abstract class AnimatedMovable {
     protected boolean isIdle;
-    protected byte speed;
+    protected byte acceleration;
     protected Point2D position;
     protected ImageView shape;
     protected Sprite sprites;
-    protected byte moveX;
-    protected byte moveY;
+    protected double speedX;
+    protected double speedY;
     protected boolean spriteReflected;
 
-    public AnimatedMovable(byte speed, Point2D position, ImageView shape, Sprite sprites){
-        this.speed = speed;
+    public AnimatedMovable(byte acceleration, Point2D position, ImageView shape, Sprite sprites){
+        this.acceleration = acceleration;
         this.isIdle = true;
         this.position = position;
         this.shape = shape;
         this.shape.setX(position.getX());
         this.shape.setY(position.getY());
         this.sprites = sprites;
-        this.moveX = 0;
-        this.moveY = 0;
+        this.speedX = 0;
+        this.speedY = 0;
         this.spriteReflected = false;
         setSprites();
     }
@@ -70,24 +71,24 @@ public abstract class AnimatedMovable {
     }
 
     public AnimatedMovable moveToDown(String prefix){
-        updateLocalization(prefix, moveX, speed);
+        // updateLocalization(prefix, speedX, speed);
         return this;
     }
 
     public AnimatedMovable moveToLeft(String prefix){
         setSpriteReflected(true);
-        updateLocalization(prefix, (byte) -speed, moveY);
+        updateLocalization(prefix, true);
         return this;
     }
 
     public AnimatedMovable moveToRight(String prefix){
         setSpriteReflected(false);
-        updateLocalization(prefix, speed, moveY);
+        updateLocalization(prefix, false);
         return this;
     }
 
     public AnimatedMovable moveToUp(String prefix){
-        updateLocalization(prefix, moveX, (byte) -speed);
+        // updateLocalization(prefix, moveX, (byte) -speed);
         return this;
     }
 
@@ -100,13 +101,12 @@ public abstract class AnimatedMovable {
         this.isIdle = idle;
     }
 
-    public void setMoveX(byte moveX) {
-        this.moveX = moveX;
+    public void setSpeedX(double speedX) {
+        this.speedX = speedX;
     }
 
-    public void setMoveY(byte moveY) {
-        this.moveY = moveY;
-
+    public void setSpeedY(double speedY) {
+        this.speedY = speedY;
     }
 
     public void setSpriteReflected(boolean spriteReflected) {
@@ -114,36 +114,56 @@ public abstract class AnimatedMovable {
     }
 
     public AnimatedMovable stopMoveY(){
-        setMoveY((byte) 0);
+        setSpeedY(0);
         return this;
     }
 
     public AnimatedMovable stopMoveX(){
-        setMoveX((byte) 0);
+        setSpeedX(0);
         return this;
     }
 
-    private AnimatedMovable updateLocalization(String prefix, byte speedX, byte speedY){
+    private AnimatedMovable updateLocalization(String prefix, boolean isLeft){
+        Collision checkCollision = CollisionController.checkCollision(new BoundingBox(
+            this.shape.getBoundsInLocal().getMinX()+acceleration, 
+            this.shape.getBoundsInLocal().getMinY(), 
+            this.shape.getBoundsInLocal().getWidth(), 
+            this.shape.getBoundsInLocal().getHeight())
+        );
+
         if(isIdle) {
             animateSprites(prefix, 11, 100);
             this.setIdle(false);
         }
-        if(
-            (!Collision.hasCollisionOnlyOneSide(shape.getX() + speed + shape.getFitHeight(), App.getAppWidth()) && speedX > 0) ||
-            (!Collision.hasCollisionOnlyOneSide(0, shape.getX() + speed) && speedX < 0)
-        ){
-            position = position.add(speedX, 0);
-            setMoveX((byte) speedX);
-            this.shape.setX(position.getX());
+
+        if((isLeft && checkCollision.getCheckLeft()) || (!isLeft && checkCollision.getCheckRight())){
+            setSpeedX(0);
+        } else if(speedX < 20){
+            setSpeedX(speedX + acceleration);
         }
-        if(
-            (!Collision.hasCollisionOnlyOneSide(shape.getY() + shape.getFitHeight() + speed, App.getAppHeight()) && speedY > 0) ||
-            (!Collision.hasCollisionOnlyOneSide(0, shape.getY() + speed) && speedY < 0)
-        ){
-            position = position.add(0, speedY);
-            setMoveY((byte) speedY);
-            this.shape.setY(position.getY());
+
+        if(isLeft){
+            position = position.subtract(Math.min(speedX, checkCollision.getMinDistanceLeft()), 0);
+        } else {
+            position = position.add(Math.min(speedX, checkCollision.getMinDistanceRight()), 0);
         }
+        this.shape.setX(position.getX());
+        
+        while(!checkCollision.getCheckDown()){
+            checkCollision = CollisionController.checkCollision(new BoundingBox(
+                this.shape.getBoundsInLocal().getMinX(), 
+                this.shape.getBoundsInLocal().getMinY()+speedY, 
+                this.shape.getBoundsInLocal().getWidth(), 
+                this.shape.getBoundsInLocal().getHeight())
+            );
+            setSpeedY(speedY + (PhysicsVariables.GRAVITY));
+            System.out.println("speed:" + speedY);
+            position = position.add(0, Math.min(speedY, checkCollision.getMinDistanceDown()));
+            System.out.println("Chegou aqui com Y = " + shape.getBoundsInLocal().getMaxY());
+            if(!checkCollision.getCheckDown()) this.shape.setY(position.getY());
+        }
+        System.out.println("Posição X: " + shape.getBoundsInLocal().getMinX() + ". Posição Y: " + shape.getBoundsInLocal().getMinY());
+        System.out.println("Shape: (" + shape.getBoundsInLocal().getCenterX() + "/" + shape.getBoundsInLocal().getMaxY() + ")");
         return this;
     }
 
