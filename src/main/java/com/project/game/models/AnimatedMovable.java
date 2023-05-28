@@ -15,7 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public abstract class AnimatedMovable {
+public class AnimatedMovable {
     protected boolean isIdle;
     protected byte acceleration;
     protected Point2D position;
@@ -40,7 +40,6 @@ public abstract class AnimatedMovable {
     }
 
     public void animateSprites(String prefix, int numSprites, int duration) {
-
         List<KeyFrame> frames = new ArrayList<>();
         for (int i = 0; i <= numSprites; i++) {
             String spriteName = sprites.getPrefix() + prefix + String.format("%03d", i);
@@ -167,5 +166,17 @@ public abstract class AnimatedMovable {
         return this;
     }
 
-    public abstract void setSprites();
+    public void setSprites(){
+        int  i = 0;
+        for (i = 0; i <= 17; i++) {
+            String spriteName = String.format(sprites.getPrefix() + "_Idle_%03d", i);
+            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Idle/" + spriteName + ".png"));
+            sprites.addSprite(spriteName, image);
+        }
+        for (i = 0; i <= 11; i++) {
+            String spriteName = String.format(sprites.getPrefix() + "_Running_%03d", i);
+            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Running/" + spriteName + ".png"));
+            sprites.addSprite(spriteName, image);
+        }
+    }
 }

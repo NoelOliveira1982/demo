@@ -3,19 +3,19 @@ package com.project.game.models;
 import java.util.UUID;
 
 import javafx.geometry.Point2D;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class Character extends AnimatedMovable  {
+public class Character {
 
     private UUID id;
     private String name;
     private byte life;
     private byte strength;
     private byte resistance;
+    private AnimatedMovable shape;
 
     public Character(String name, ImageView shape, byte speed, Point2D position, Sprite sprites, byte resistance, byte strength, byte life){
-        super(speed, position, shape, sprites);
+        this.shape = new AnimatedMovable(speed, position, shape, sprites);
         this.id = UUID.randomUUID();
         this.name = name;
         this.life = life;
@@ -48,7 +48,7 @@ public class Character extends AnimatedMovable  {
     }
 
     public Point2D getPosition() {
-        return position;
+        return shape.position;
     }
 
     public Character regenerate(byte life){
@@ -57,20 +57,50 @@ public class Character extends AnimatedMovable  {
     }
 
     public void setIdle(boolean isIdle) {
-        this.isIdle = isIdle;
+        this.shape.isIdle = isIdle;
     }
 
-    public void setSprites(){
-        int  i = 0;
-        for (i = 0; i <= 17; i++) {
-            String spriteName = String.format(sprites.getPrefix() + "_Idle_%03d", i);
-            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Idle/" + spriteName + ".png"));
-            sprites.addSprite(spriteName, image);
-        }
-        for (i = 0; i <= 11; i++) {
-            String spriteName = String.format(sprites.getPrefix() + "_Running_%03d", i);
-            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Running/" + spriteName + ".png"));
-            sprites.addSprite(spriteName, image);
-        }
+
+
+    public void moveToUp(String string) {
+        shape.moveToUp(string);
     }
+
+
+
+    public void moveToDown(String string) {
+        shape.moveToDown(string);
+    }
+
+
+
+    public void moveToLeft(String string) {
+        shape.moveToLeft(string);
+    }
+
+
+
+    public void moveToRight(String string) {
+        shape.moveToRight(string);
+    }
+
+
+
+    public void playIdleAnimation() {
+        shape.playIdleAnimation();
+    }
+
+
+
+    public void stopMoveY() {
+        shape.stopMoveY();
+    }
+
+
+
+    public void stopMoveX() {
+        shape.stopMoveX();
+    }
+
+
 }

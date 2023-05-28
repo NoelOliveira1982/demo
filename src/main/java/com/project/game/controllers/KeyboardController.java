@@ -24,6 +24,8 @@ public class KeyboardController {
                 player.moveToRight("_Running_");
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -41,6 +43,8 @@ public class KeyboardController {
                 player.stopMoveX();
                 break;
             }
+            default:
+                break;
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.project.game.controllers;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 import javafx.scene.image.ImageView;
 
