@@ -8,18 +8,21 @@ import javafx.scene.image.Image;
 public class Sprite {
     private String currentSprite;
     private String prefix;
+    private String folder;
     private Map<String, Image> sprites;
 
-    public Sprite(Map<String, Image> sprites, String prefix){
+    public Sprite(Map<String, Image> sprites, String prefix, String folder){
         this.currentSprite = "";
         this.sprites = sprites;
         this.prefix = prefix;
+        this.folder = folder;
     }
 
-    public Sprite(String prefix){
+    public Sprite(String prefix, String folder){
         this.currentSprite = "";
         this.sprites = new HashMap<>();
         this.prefix = prefix;
+        this.folder = folder;
     }
 
     public Sprite(){
@@ -30,6 +33,10 @@ public class Sprite {
     public Sprite addSprite(String key, Image img){
         sprites.put(key, img);
         return this;
+    }
+
+    public String getFolder() {
+        return folder;
     }
 
     public Image getSprite(String key){

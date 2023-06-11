@@ -13,7 +13,9 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
+
 
 public class AnimatedMovable {
     protected boolean isIdle;
@@ -23,7 +25,8 @@ public class AnimatedMovable {
     protected Sprite sprites;
     protected double speedX;
     protected double speedY;
-    protected boolean spriteReflected;
+    protected boolean moveLeft;
+    protected boolean moveUp;
 
     public AnimatedMovable(byte acceleration, Point2D position, ImageView shape, Sprite sprites){
         this.acceleration = acceleration;
@@ -35,7 +38,8 @@ public class AnimatedMovable {
         this.sprites = sprites;
         this.speedX = 0;
         this.speedY = 0;
-        this.spriteReflected = false;
+        this.moveLeft = false;
+        this.moveUp = false;
         setSprites();
     }
 
@@ -55,7 +59,7 @@ public class AnimatedMovable {
             }
         }
         shape.setImage(sprites.getCurrentSprite());
-        if(spriteReflected){
+        if(moveLeft){
             shape.setScaleX(-1);
         } else {
             shape.setScaleX(1);
@@ -70,24 +74,24 @@ public class AnimatedMovable {
     }
 
     public AnimatedMovable moveToDown(String prefix){
-        // updateLocalization(prefix, speedX, speed);
+        updateLocalization(prefix, KeyCode.DOWN);
         return this;
     }
 
     public AnimatedMovable moveToLeft(String prefix){
-        setSpriteReflected(true);
-        updateLocalization(prefix, true);
+        setMoveLeft(true);
+        updateLocalization(prefix, KeyCode.LEFT);
         return this;
     }
 
     public AnimatedMovable moveToRight(String prefix){
-        setSpriteReflected(false);
-        updateLocalization(prefix, false);
+        setMoveLeft(false);
+        updateLocalization(prefix, KeyCode.RIGHT);
         return this;
     }
 
     public AnimatedMovable moveToUp(String prefix){
-        // updateLocalization(prefix, moveX, (byte) -speed);
+        updateLocalization(prefix, KeyCode.UP);
         return this;
     }
 
@@ -100,6 +104,10 @@ public class AnimatedMovable {
         this.isIdle = idle;
     }
 
+    public void setMoveUp(boolean moveUp) {
+        this.moveUp = moveUp;
+    }
+
     public void setSpeedX(double speedX) {
         this.speedX = speedX;
     }
@@ -108,8 +116,8 @@ public class AnimatedMovable {
         this.speedY = speedY;
     }
 
-    public void setSpriteReflected(boolean spriteReflected) {
-        this.spriteReflected = spriteReflected;
+    public void setMoveLeft(boolean moveLeft) {
+        this.moveLeft = moveLeft;
     }
 
     public AnimatedMovable stopMoveY(){
@@ -122,10 +130,10 @@ public class AnimatedMovable {
         return this;
     }
 
-    private AnimatedMovable updateLocalization(String prefix, boolean isLeft){
+    private AnimatedMovable updateLocalization(String prefix, KeyCode direction){
         Collision checkCollision = CollisionController.checkCollision(new BoundingBox(
-            this.shape.getBoundsInLocal().getMinX()+acceleration, 
-            this.shape.getBoundsInLocal().getMinY(), 
+            this.shape.getBoundsInLocal().getMinX() + (direction == KeyCode.LEFT ? acceleration : direction == KeyCode.RIGHT ? (-acceleration) : 0), 
+            this.shape.getBoundsInLocal().getMinY() + (direction == KeyCode.DOWN ? acceleration : direction == KeyCode.UP ? (-acceleration) : 0), 
             this.shape.getBoundsInLocal().getWidth(), 
             this.shape.getBoundsInLocal().getHeight())
         );
@@ -135,34 +143,33 @@ public class AnimatedMovable {
             this.setIdle(false);
         }
 
-        if((isLeft && checkCollision.getCheckLeft()) || (!isLeft && checkCollision.getCheckRight())){
+        if((direction == KeyCode.LEFT && checkCollision.getCheckLeft()) || (direction == KeyCode.RIGHT && checkCollision.getCheckRight())){
             setSpeedX(0);
         } else if(speedX < 20){
             setSpeedX(speedX + acceleration);
         }
 
-        if(isLeft){
+        if((direction == KeyCode.UP && checkCollision.getCheckUp()) || (direction == KeyCode.DOWN && checkCollision.getCheckDown())) {
+            setSpeedY(0);
+        } else if(speedY < 20){
+            setSpeedY(speedY + acceleration);
+        }
+
+        if(direction == KeyCode.LEFT){
             position = position.subtract(Math.min(speedX, checkCollision.getMinDistanceLeft()), 0);
-        } else {
+        } else if (direction == KeyCode.RIGHT) {
             position = position.add(Math.min(speedX, checkCollision.getMinDistanceRight()), 0);
         }
-        this.shape.setX(position.getX());
-        
-        while(!checkCollision.getCheckDown()){
-            checkCollision = CollisionController.checkCollision(new BoundingBox(
-                this.shape.getBoundsInLocal().getMinX(), 
-                this.shape.getBoundsInLocal().getMinY()+speedY, 
-                this.shape.getBoundsInLocal().getWidth(), 
-                this.shape.getBoundsInLocal().getHeight())
-            );
-            setSpeedY(speedY + (PhysicsVariables.GRAVITY));
-            System.out.println("speed:" + speedY);
+
+        if(direction == KeyCode.UP) {
+            position = position.subtract(0, Math.min(speedY, checkCollision.getMinDistanceDown()));
+        } else if(direction == KeyCode.DOWN){
             position = position.add(0, Math.min(speedY, checkCollision.getMinDistanceDown()));
-            System.out.println("Chegou aqui com Y = " + shape.getBoundsInLocal().getMaxY());
-            if(!checkCollision.getCheckDown()) this.shape.setY(position.getY());
         }
-        System.out.println("Posição X: " + shape.getBoundsInLocal().getMinX() + ". Posição Y: " + shape.getBoundsInLocal().getMinY());
-        System.out.println("Shape: (" + shape.getBoundsInLocal().getCenterX() + "/" + shape.getBoundsInLocal().getMaxY() + ")");
+        
+        this.shape.setX(position.getX());
+        this.shape.setY(position.getY());
+        
         return this;
     }
 
@@ -170,12 +177,12 @@ public class AnimatedMovable {
         int  i = 0;
         for (i = 0; i <= 17; i++) {
             String spriteName = String.format(sprites.getPrefix() + "_Idle_%03d", i);
-            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Idle/" + spriteName + ".png"));
+            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/" + sprites.getFolder() + "/Idle/" + spriteName + ".png"));
             sprites.addSprite(spriteName, image);
         }
         for (i = 0; i <= 11; i++) {
             String spriteName = String.format(sprites.getPrefix() + "_Running_%03d", i);
-            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/player/Running/" + spriteName + ".png"));
+            Image image = new Image(getClass().getResourceAsStream("/com/project/game/sprites/" + sprites.getFolder() + "/Running/" + spriteName + ".png"));
             sprites.addSprite(spriteName, image);
         }
     }

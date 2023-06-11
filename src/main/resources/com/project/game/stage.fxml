@@ -8,5 +8,6 @@
     <ImageView fx:id="ground2" />
     <ImageView fx:id="ground3" />
     <ImageView fx:id="ground4" />
-    <ImageView fx:id="player1Shape" />
+    <ImageView fx:id="playerShape" />
+    <ImageView fx:id="enemyShape" />
 </AnchorPane>

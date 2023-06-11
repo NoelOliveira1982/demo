@@ -16,7 +16,9 @@ import javafx.scene.input.KeyEvent;
 public class StageController implements Initializable {
 
     @FXML
-    private ImageView player1Shape;
+    private ImageView playerShape;
+    @FXML
+    private ImageView enemyShape;
     @FXML
     private ImageView ground;
     @FXML
@@ -27,10 +29,22 @@ public class StageController implements Initializable {
     private ImageView ground4;
 
     private Character player1;
+    private Character player2;
 
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+
+        playerShape.setPreserveRatio(false);
+        playerShape.setFitHeight(130);
+        playerShape.setFitWidth(115);
+        player1 = createPlayer("Jorge", "player", playerShape);
+
+        enemyShape.setPreserveRatio(false);
+        enemyShape.setFitHeight(130);
+        enemyShape.setFitWidth(115);
+        player2 = createPlayer("Teste", "enemy", enemyShape);
+
         ground.setImage(new Image(getClass().getResourceAsStream("/com/project/game/sprites/scenario/ground.png")));
         ground.setY(460);
         ground.setX(0);
@@ -49,8 +63,8 @@ public class StageController implements Initializable {
         EntitiesController.addEntity(ground);
         EntitiesController.addEntity(ground2);
         EntitiesController.addEntity(ground3);
-        createPlayer();
         player1.playIdleAnimation();
+        player2.playIdleAnimation();
     }
 
     public void controlPlayerPressed(KeyEvent event) {
@@ -61,19 +75,15 @@ public class StageController implements Initializable {
         KeyboardController.keyboardHandlerReleased(event, player1);
     }
 
-    public void createPlayer(){
-        player1Shape.setPreserveRatio(false);
-        player1Shape.setFitHeight(130);
-        player1Shape.setFitWidth(115);
-
-        player1 = new CharacterConstructor()
-            .withName("Jorge")
+    public Character createPlayer(String name, String folder, ImageView shape){
+        return new CharacterConstructor()
+            .withName(name)
             .withLife((byte) 100)
             .withPosition(new  Point2D(0, 0))
-            .withResistance((byte) 30).withShape(player1Shape)
+            .withResistance((byte) 30).withShape(shape)
             .withSpeed((byte) 5)
             .withStrength((byte) 30)
-            .withSprites(new  Sprite("0_Reaper_Man"))
+            .withSprites(new  Sprite("0_Reaper_Man", folder))
             .build();
     }
 }
